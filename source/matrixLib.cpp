@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 #include "../include/matrixLib.hpp"
-#include "../include/memoryBufferLib.hpp"
 
 void matrixInit(int h, int w, Matrix* matrix) {
     assert(matrix != NULL);
@@ -12,7 +11,8 @@ void matrixInit(int h, int w, Matrix* matrix) {
 
     matrix->h = h;
     matrix->w = w;
-    allocateMemory(matrix);
+    int need = matrix->h * matrix->w;
+    matrix->data = (MatrixElem*)calloc(need, sizeof(MatrixElem));
 }
 
 void matrixRead(Matrix* matrix) {
@@ -131,7 +131,7 @@ void matricesAdd(const Matrix* one, const Matrix* two, Matrix* res) {
 // WorkspaceDtor
 // GetMatrixMultipilcationSizes
 
-static void matricesMultiplyWithTranspon(const Matrix* one, const Matrix* two, Matrix* res) {
+static void matricesMultiplyWithTranspon(const Matrix* one, const Matrix* two, const MatrixWorkspace* workspace, Matrix* res) {
     assert(one       != NULL);
     assert(two       != NULL);
     assert(res       != NULL);
