@@ -5,11 +5,8 @@
 #include "../include/matrixLib.hpp"
 #include "../include/perfomanceTestLib.hpp"
 
-// #define TEST_PERFOMANCE
-
 void classShowcase();
 void testPerfomance();
-
 
 int main() {
 #ifdef TEST_PERFOMANCE
@@ -24,7 +21,12 @@ int main() {
 void testPerfomance() {
     Tester tester;
     int cntOfTests = 10;
-    Randomizer randomizer = {-100, 100, 300, 500, 300, 500};
+    int low  = 800;
+    int high = 1000;
+
+    // don't put too big numbers with int type, beware of overflow,
+    // if you have abs(number) < A, then numbers will go up to A ^ 3
+    Randomizer randomizer = {-100, 100, low, high, low, high};
     generateTests(&tester, cntOfTests, &randomizer);
 
     long double timeWithoutTransp = runOnTests(&tester, matricesMultiplyStandart);
@@ -38,12 +40,11 @@ void testPerfomance() {
 }
 
 void classShowcase() {
-    printf("Hello world!\n");
-
     Matrix matrix = {};
     matrixInit(5, 4, &matrix);
     matrixRead(&matrix);
     matrixPrint(&matrix);
+
     Matrix transpMatrix = {};
     matrixInit(matrix.w, matrix.h, &transpMatrix);
     matrixTranspon(&matrix, &transpMatrix);

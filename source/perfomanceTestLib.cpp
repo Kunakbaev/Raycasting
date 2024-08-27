@@ -7,14 +7,15 @@
 #include "../include/matrixLib.hpp"
 
 static int dice(int lower, int upper) {
-    assert(lower < upper);
+    assert(lower <= upper);
+
     int len = upper - lower + 1;
     int num = lower + (rand() % len);
     return num;
 }
 
 static void generateMatrix(Matrix* matrix, size_t height, size_t width, const Randomizer* randomizer) {
-    assert(matrix     != NULL);
+    assert(matrix                    != NULL);
     assert(randomizer->numLowerBound < randomizer->numUpperBound);
 
     matrixInit(height, width, matrix);
@@ -42,6 +43,7 @@ static void generateTest(Test* test, const Randomizer* randomizer) {
 
 void generateTests(Tester* tester, int numOfTests, const Randomizer* randomizer) {
     assert(tester     != NULL);
+    assert(numOfTests > 0);
 
     srand((unsigned int)time(NULL));
     tester->cntOfTests = numOfTests;
@@ -51,17 +53,23 @@ void generateTests(Tester* tester, int numOfTests, const Randomizer* randomizer)
 }
 
 void runOnTest(const Test* test, funcPtr solver) {
-    Matrix result;
+    assert(test   != NULL);
+    assert(solver != NULL);
+
+    Matrix result = {};
     getMatrixMultipilcationSizes(&test->one, &test->two, &result.h, &result.w);
     matrixInit(result.h, result.w, &result);
     (*solver)(&test->one, &test->two, &result);
 }
 
 long double runOnTests(const Tester* tester, funcPtr solver) {
+    assert(tester        != NULL);
+    assert(tester->tests != NULL);
+    assert(solver        != NULL);
+
     clock_t startTime = clock();
-    for (int i = 0; i < tester->cntOfTests; ++i) {
+    for (int i = 0; i < tester->cntOfTests; ++i)
         runOnTest(&tester->tests[i], solver);
-    }
 
     clock_t finishTime = clock();
     long double timeToCompute = (long double)(finishTime - startTime) / CLOCKS_PER_SEC;

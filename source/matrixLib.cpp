@@ -136,8 +136,8 @@ void matricesMultiplyWithTranspon(const Matrix* one, const Matrix* two, Matrix* 
     assert(one->w    == two->h);
     assert(one->data != NULL);
     assert(two->data != NULL);
-    assert(res->h == one->h);
-    assert(res->w == two->w);
+    assert(res->h    == one->h);
+    assert(res->w    == two->w);
 
     Matrix transp = {}; // matrix на стеке громкое заявление
     matrixInit(two->w, two->h, &transp);
