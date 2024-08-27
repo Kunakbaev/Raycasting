@@ -18,11 +18,16 @@ int main() {
 //     classShowcase();
 // #endif
 
-    Circle circle;
-    initCircle(30, &circle);
-    printCircle(&circle);
+    // Circle circle;
+    // initCircle(31, &circle);
+    // printCircle(&circle);
 
-
+    Matrix matrix = {};
+    matrixInit(4, 4, &matrix);
+    matrixRead(&matrix);
+    matrixPrint(&matrix);
+    MatrixElem determ = getDetermine(&matrix);
+    printf("determ : %d\n", determ);
 
     return 0;
 }
@@ -89,10 +94,14 @@ void classShowcase() {
 
 matrix example:
 
+1 2
+3 4
+
 11 12 13 14
 21 22 23 23
 31 32 33 34
 41 42 43 44
+
 51 52 53 54
 
 11 12 13 14 15 16 17

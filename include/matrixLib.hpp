@@ -24,6 +24,7 @@ void matricesMultiplyStandart(const Matrix* one, const Matrix* two, Matrix* res)
 void matricesMultiply(const Matrix* one, const Matrix* two, Matrix* res, MatrixMultiplicationAlgo algo);
 void getMatrixMultipilcationSizes(const Matrix* one, const Matrix* two, size_t* rows, size_t* cols);
 size_t getMatrixElemIndex(const Matrix* matrix, size_t row, size_t col);
+MatrixElem getDetermine(const Matrix* matrix);
 
 #endif
 

@@ -4,7 +4,7 @@
 struct Circle {
     int radius;
     int* rowsSizes;
-    int* matrix;
+    char* matrix;
     int* strides;
 };
 

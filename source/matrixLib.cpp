@@ -204,3 +204,35 @@ void matricesMultiply(const Matrix* one, const Matrix* two, Matrix* res, MatrixM
         matricesMultiplyWithTranspon(one, two, res);
     }
 }
+
+MatrixElem getDetermine(const Matrix* matrix) {
+    assert(matrix != NULL);
+    assert(matrix->w == matrix->h);
+
+    if (matrix->w == 2) {
+        return matrix->data[0] * matrix->data[3] -
+            matrix->data[1] * matrix->data[2];
+    }
+
+    MatrixElem result = 0;
+    for (int j = 0; j < matrix->w; ++j) {
+        Matrix sub = {};
+        matrixInit(matrix->h - 1, matrix->w - 1, &sub);
+
+        for (int i = 0; i < matrix->h - 1; ++i) {
+            for (int j2 = 0; j2 < matrix->w - 1; ++j2) {
+                int jjj = (j + j2 + 1);
+                if (jjj >= matrix->w)
+                    jjj -= matrix->w;
+                size_t srcInd  = getMatrixElemIndex(matrix, i + 1, jjj);
+                size_t destInd = getMatrixElemIndex(&sub, i, j2);
+                sub.data[destInd] = matrix->data[srcInd];
+            }
+        }
+
+        MatrixElem deter = getDetermine(&sub);
+        result += ((j & 1) ? -1 : 1) * deter;
+    }
+
+    return result;
+}
