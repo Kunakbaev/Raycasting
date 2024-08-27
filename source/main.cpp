@@ -28,6 +28,16 @@ int main() {
     matrixRead(&matrix_2);
     matrixPrint(&matrix_2);
 
+    // ------------------------------       MATRIX MULT     ---------------------------------------
+
+    Matrix addResult = {};
+    matrixInit(matrix.h, matrix.w, &addResult);
+    matricesAdd(&matrix, &matrix, &addResult);
+    printf("\n\n addition result matrix:\n");
+    matrixPrint(&addResult);
+
+    // ------------------------------       MATRIX ADD     ---------------------------------------
+
     Matrix multResult = {};
     getMatrixMultipilcationSizes(&matrix, &matrix_2, &multResult.h, &multResult.w);
     matrixInit(multResult.h, multResult.w, &multResult);
@@ -37,6 +47,9 @@ int main() {
 
 
 
+
+
+    freeMemory(&addResult);
     freeMemory(&multResult);
     freeMemory(&matrix);
     freeMemory(&matrix_2);

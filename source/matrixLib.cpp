@@ -104,7 +104,24 @@ static int getMatrixElemIndex(const Matrix* matrix, int row, int col){
 }
 
 void matricesAdd(const Matrix* one, const Matrix* two, Matrix* res) {
+    assert(one       != NULL);
+    assert(two       != NULL);
+    assert(res       != NULL);
+    assert(one->w    == two->w);
+    assert(one->h    == two->h);
+    assert(one->data != NULL);
+    assert(two->data != NULL);
 
+    for (int i = 0; i < res->h; ++i) {
+        for (int j = 0; j < res->w; ++j) {
+            int oneInd = getMatrixElemIndex(one, i, j);
+            int twoInd = getMatrixElemIndex(two, i, j);
+            int resInd = getMatrixElemIndex(res, i, j);
+
+            // be carefull with overflow
+            res->data[resInd] = one->data[oneInd] + two->data[twoInd];
+        }
+    }
 }
 
 // GetMatrixElem(row, col);
@@ -121,6 +138,8 @@ static void matricesMultiplyWithTranspon(const Matrix* one, const Matrix* two, M
     assert(one->w    == two->h);
     assert(one->data != NULL);
     assert(two->data != NULL);
+    assert(res->h == one->h);
+    assert(res->w == two->w);
 
     Matrix transp = {}; // matrix на стеке громкое заявление
     matrixInit(two->w, two->h, &transp);
