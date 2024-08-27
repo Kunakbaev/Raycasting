@@ -63,18 +63,41 @@ void runOnTest(const Test* test, funcPtr solver) {
     (*solver)(&test->one, &test->two, &result);
 }
 
-long double runOnTests(const Tester* tester, funcPtr solver) {
+static long double sq(long double x) {
+    return x * x;
+}
+
+long double runOnTests(const Tester* tester, funcPtr solver, long double* disp) {
     assert(tester        != NULL);
     assert(tester->tests != NULL);
     assert(solver        != NULL);
+    assert(disp          != NULL);
+    //assert(tester->cntOfTests > 0);
 
-    clock_t startTime = clock();
-    for (int i = 0; i < tester->cntOfTests; ++i)
+
+    long double mean = 0;
+    *disp = 0;
+
+    long double* runTimes = (long double*)calloc(tester->cntOfTests, sizeof(long double));
+    assert(runTimes != NULL);
+    for (int i = 0; i < tester->cntOfTests; ++i) {
+        clock_t startTime = clock();
         runOnTest(&tester->tests[i], solver);
+        clock_t finishTime = clock();
+        long double timeToCompute = (long double)(finishTime - startTime) / CLOCKS_PER_SEC;
 
-    clock_t finishTime = clock();
-    long double timeToCompute = (long double)(finishTime - startTime) / CLOCKS_PER_SEC;
-    return timeToCompute;
+        mean += timeToCompute;
+        runTimes[i] = timeToCompute;
+    }
+
+    mean /= tester->cntOfTests;
+    for (int i = 0; i < tester->cntOfTests; ++i) {
+        *disp += sq(runTimes[i] - mean);
+    }
+    *disp /= tester->cntOfTests;
+
+    free(runTimes);
+    return mean;
 }
 
 void destructTester(Tester* tester) {

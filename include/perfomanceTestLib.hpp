@@ -32,7 +32,7 @@ typedef void (*funcPtr)(const Matrix* one, const Matrix* two, Matrix* res);
 
 void generateTests(Tester* tester, int numOfTests, const Randomizer* randomizer);
 void runOnTest(const Test* test, funcPtr solver);
-long double runOnTests(const Tester* tester, funcPtr solver);
+long double runOnTests(const Tester* tester, funcPtr solver, long double* disp);
 void destructTester(Tester* tester);
 
 #endif

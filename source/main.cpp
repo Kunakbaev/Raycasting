@@ -12,22 +12,22 @@ void testPerfomance();
 
 
 int main() {
-// #ifdef TEST_PERFOMANCE
-//     testPerfomance();
-// #else
-//     classShowcase();
-// #endif
+#ifdef TEST_PERFOMANCE
+    testPerfomance();
+#else
+    classShowcase();
+#endif
 
     // Circle circle;
     // initCircle(31, &circle);
     // printCircle(&circle);
 
-    Matrix matrix = {};
-    matrixInit(4, 4, &matrix);
-    matrixRead(&matrix);
-    matrixPrint(&matrix);
-    MatrixElem determ = getDetermine(&matrix);
-    printf("determ : %d\n", determ);
+    // Matrix matrix = {};
+    // matrixInit(4, 4, &matrix);
+    // matrixRead(&matrix);
+    // matrixPrint(&matrix);
+    // MatrixElem determ = getDetermine(&matrix);
+    // printf("determ : %d\n", determ);
 
     return 0;
 }
@@ -44,13 +44,15 @@ void testPerfomance() {
     Randomizer randomizer = {-100, 100, low, high, low, high};
     generateTests(&tester, cntOfTests, &randomizer);
 
-    long double timeWithoutTransp = runOnTests(&tester, matricesMultiplyStandart);
-    long double timeWithTransp    = runOnTests(&tester, matricesMultiplyWithTranspon);
-    long double meanArifmWithout  = timeWithoutTransp / cntOfTests;
-    long double meanArifmWith     = timeWithTransp / cntOfTests;
+    long double dispWithout = 0;
+    long double dispWith    = 0;
+    long double meanArifmWithout = runOnTests(&tester, matricesMultiplyStandart, &dispWithout);
+    long double meanArifmWith    = runOnTests(&tester, matricesMultiplyWithTranspon, &dispWith);
 
-    printf("mean arifmetic time per test without transp: %.10Lg\n", meanArifmWithout);
-    printf("mean arifmetic time per test with    transp: %.10Lg\n", meanArifmWith);
+    printf("mean arifmetic time per test without transp: %.10Lg+-%.10Lg\n",
+        meanArifmWithout, dispWithout);
+    printf("mean arifmetic time per test with    transp: %.10Lg+-%.10Lg\n",
+        meanArifmWith, dispWith);
     destructTester(&tester);
 }
 
