@@ -27,6 +27,7 @@ struct Tester {
     Randomizer randomizer;
 };
 
+//        MulMatricesFuncPtr
 typedef void (*funcPtr)(const Matrix* one, const Matrix* two, Matrix* res);
 
 void generateTests(Tester* tester, int numOfTests, const Randomizer* randomizer);

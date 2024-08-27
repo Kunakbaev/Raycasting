@@ -6,6 +6,7 @@
 #include "../include/perfomanceTestLib.hpp"
 #include "../include/matrixLib.hpp"
 
+//    getRandInRange()
 static int dice(int lower, int upper) {
     assert(lower <= upper);
 
@@ -45,7 +46,7 @@ void generateTests(Tester* tester, int numOfTests, const Randomizer* randomizer)
     assert(tester     != NULL);
     assert(numOfTests > 0);
 
-    srand((unsigned int)time(NULL));
+    srand(1ULL);
     tester->cntOfTests = numOfTests;
     tester->tests = (Test*)calloc((size_t)numOfTests, sizeof(Test));
     for (int i = 0; i < numOfTests; ++i)

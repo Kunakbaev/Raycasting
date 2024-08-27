@@ -68,13 +68,14 @@ static MatrixElem getScalarMult(const MatrixElem* one, const MatrixElem* two, si
     MatrixElem result = 0;
     size_t i = 0;
     // vectorised for
-    for (; i + 4 - 1 < arrLen; i += 4) {
-        // be carefull with overflow
-        result += one[i + 0] * two[i + 0];
-        result += one[i + 1] * two[i + 1];
-        result += one[i + 2] * two[i + 2];
-        result += one[i + 3] * two[i + 3];
-    }
+
+    // for (; i + 4 - 1 < arrLen; i += 4) {
+    //     // be carefull with overflow
+    //     result += one[i + 0] * two[i + 0];
+    //     result += one[i + 1] * two[i + 1];
+    //     result += one[i + 2] * two[i + 2];
+    //     result += one[i + 3] * two[i + 3];
+    // }
     for (; i < arrLen; ++i) {
         // be carefull with overflow
         result += one[i] * two[i];
@@ -93,9 +94,9 @@ MatrixElem* matrixGetRow(const Matrix* matrix, size_t row) {
 
 size_t getMatrixElemIndex(const Matrix* matrix, size_t row, size_t col) {
     assert(matrix != NULL);
-    // assert(0 <= row);
+    // // assert(0 <= row);
     assert(row < matrix->h);
-    // assert(0 <= col);
+    // // assert(0 <= col);
     assert(col < matrix->w);
 
     return row * matrix->w + col;

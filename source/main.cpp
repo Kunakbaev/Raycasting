@@ -4,25 +4,35 @@
 
 #include "../include/matrixLib.hpp"
 #include "../include/perfomanceTestLib.hpp"
+#include "../include/circleLib.hpp"
 
 void classShowcase();
 void testPerfomance();
 
+
+
 int main() {
-#ifdef TEST_PERFOMANCE
-    testPerfomance();
-#else
-    classShowcase();
-#endif
+// #ifdef TEST_PERFOMANCE
+//     testPerfomance();
+// #else
+//     classShowcase();
+// #endif
+
+    Circle circle;
+    initCircle(30, &circle);
+    printCircle(&circle);
+
+
 
     return 0;
 }
 
 void testPerfomance() {
     Tester tester;
-    int cntOfTests = 10;
-    int low  = 800;
-    int high = 1000;
+    int cntOfTests = 5;
+    int low  = 1200;
+    int high = 1400;
+    //low = 300, high = 500;
 
     // don't put too big numbers with int type, beware of overflow,
     // if you have abs(number) < A, then numbers will go up to A ^ 3
