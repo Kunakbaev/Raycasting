@@ -231,7 +231,9 @@ MatrixElem getDetermine(const Matrix* matrix) {
         }
 
         MatrixElem deter = getDetermine(&sub);
-        result += ((j & 1) ? -1 : 1) * deter;
+        int elemInd = getMatrixElemIndex(matrix, 0, j);
+        int elem = matrix->data[elemInd];
+        result += ((j & 1) ? -1 : 1) * deter * elem;
     }
 
     return result;
