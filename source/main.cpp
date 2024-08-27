@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "../include/matrixLib.hpp"
+#include "../include/memoryBufferLib.hpp"
 
 
 
@@ -33,6 +34,13 @@ int main() {
     matricesMultiply(&matrix, &matrix_2, &multResult, NO_TRANSPONATION);
     printf("\n\n multiplication result matrix:\n");
     matrixPrint(&multResult);
+
+
+
+    freeMemory(&multResult);
+    freeMemory(&matrix);
+    freeMemory(&matrix_2);
+    freeMemory(&transpMatrix);
 
     return 0;
 }

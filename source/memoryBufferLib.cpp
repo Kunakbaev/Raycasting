@@ -4,7 +4,8 @@
 #include "../include/memoryBufferLib.hpp"
 #include "../include/matrixLib.hpp"
 
-const int MEM_SIZE = 1e3 + 10;
+// should be around 3e6
+const int MEM_SIZE = 1e4 + 10;
 
 // memory allocated on heap
 MatrixElem buffer[MEM_SIZE];
@@ -17,7 +18,7 @@ void allocateMemory(Matrix* matrix) {
 
     int need = matrix->h * matrix->w;
     assert(bufferPtr - buffer + need - 1 <= MEM_SIZE);
-    matrix->data = (MatrixElem*)buffer;
+    matrix->data = (MatrixElem*)bufferPtr;
     bufferPtr += need;
 }
 

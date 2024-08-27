@@ -1,3 +1,5 @@
+#ifndef MEMORY_BUFFER_LIB
+#define MEMORY_BUFFER_LIB
 
 #include "matrixLib.hpp"
 
@@ -7,3 +9,5 @@
 void allocateMemory(Matrix* matrix);
 
 void freeMemory(Matrix* matrix);
+
+#endif
