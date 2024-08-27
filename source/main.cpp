@@ -3,13 +3,41 @@
 #include <stdlib.h>
 
 #include "../include/matrixLib.hpp"
-#include "../include/memoryBufferLib.hpp"
+#include "../include/perfomanceTestLib.hpp"
 
+// #define TEST_PERFOMANCE
 
-
+void classShowcase();
+void testPerfomance();
 
 
 int main() {
+#ifdef TEST_PERFOMANCE
+    testPerfomance();
+#else
+    classShowcase();
+#endif
+
+    return 0;
+}
+
+void testPerfomance() {
+    Tester tester;
+    int cntOfTests = 10;
+    Randomizer randomizer = {-100, 100, 300, 500, 300, 500};
+    generateTests(&tester, cntOfTests, &randomizer);
+
+    long double timeWithoutTransp = runOnTests(&tester, matricesMultiplyStandart);
+    long double timeWithTransp    = runOnTests(&tester, matricesMultiplyWithTranspon);
+    long double meanArifmWithout  = timeWithoutTransp / cntOfTests;
+    long double meanArifmWith     = timeWithTransp / cntOfTests;
+
+    printf("mean arifmetic time per test without transp: %.10Lg\n", meanArifmWithout);
+    printf("mean arifmetic time per test with    transp: %.10Lg\n", meanArifmWith);
+    destructTester(&tester);
+}
+
+void classShowcase() {
     printf("Hello world!\n");
 
     Matrix matrix = {};
@@ -44,18 +72,6 @@ int main() {
     matricesMultiply(&matrix, &matrix_2, &multResult, NO_TRANSPONATION);
     printf("\n\n multiplication result matrix:\n");
     matrixPrint(&multResult);
-
-
-
-
-
-    freeMemory(&addResult);
-    freeMemory(&multResult);
-    freeMemory(&matrix);
-    freeMemory(&matrix_2);
-    freeMemory(&transpMatrix);
-
-    return 0;
 }
 
 /*

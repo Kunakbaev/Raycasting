@@ -4,14 +4,14 @@
 
 #include "../include/matrixLib.hpp"
 
-void matrixInit(int h, int w, Matrix* matrix) {
+void matrixInit(size_t h, size_t w, Matrix* matrix) {
     assert(matrix != NULL);
     assert(h >= 1);
     assert(w >= 1);
 
     matrix->h = h;
     matrix->w = w;
-    int need = matrix->h * matrix->w;
+    size_t need = matrix->h * matrix->w;
     matrix->data = (MatrixElem*)calloc(need, sizeof(MatrixElem));
 }
 
@@ -20,9 +20,9 @@ void matrixRead(Matrix* matrix) {
     assert(matrix->data != NULL);
 
     printf("Please print your matrix:\n");
-    for (int i = 0; i < matrix->h; ++i)
-        for (int j = 0; j < matrix->w; ++j) {
-            int elemInd = i * matrix->w + j;
+    for (size_t i = 0; i < matrix->h; ++i)
+        for (size_t j = 0; j < matrix->w; ++j) {
+            size_t elemInd = getMatrixElemIndex(matrix, i, j);
             scanf("%d", &matrix->data[elemInd]);
         }
 }
@@ -31,12 +31,11 @@ void matrixPrint(const Matrix* matrix) {
     assert(matrix       != NULL);
     assert(matrix->data != NULL);
 
-    const char* delims = ",";
     printf("{\n");
-    for (int i = 0; i < matrix->h; ++i) {
+    for (size_t i = 0; i < matrix->h; ++i) {
         printf("    { ");
-        for (int j = 0; j < matrix->w; ++j) {
-            int elemInd = i * matrix->w + j;
+        for (size_t j = 0; j < matrix->w; ++j) {
+            size_t elemInd = getMatrixElemIndex(matrix, i, j);
             printf("%d", matrix->data[elemInd]);
             if (j != matrix->w - 1)
                 printf(",");
@@ -53,10 +52,10 @@ void matrixTranspon(const Matrix* src, Matrix* dest) {
     assert(src->data  != NULL);
     assert(dest->data != NULL);
 
-    for (int i = 0; i < src->h; ++i)
-        for (int j = 0; j < src->w; ++j) {
-            int srcInd  = i * src->w  + j;
-            int destInd = j * dest->w + i;
+    for (size_t i = 0; i < src->h; ++i)
+        for (size_t j = 0; j < src->w; ++j) {
+            size_t srcInd  = getMatrixElemIndex(src,  i, j);
+            size_t destInd = getMatrixElemIndex(dest, j, i);
             dest->data[destInd] = src->data[srcInd];
         }
 }
@@ -83,21 +82,20 @@ static MatrixElem getScalarMult(const MatrixElem* one, const MatrixElem* two, si
     return result;
 }
 
-MatrixElem* matrixGetRow(const Matrix* matrix, int row) {
+MatrixElem* matrixGetRow(const Matrix* matrix, size_t row) {
     assert(matrix != NULL);
     assert(matrix->data != NULL);
-    assert(0 <= row);
+    // assert(0 <= row);
     assert(row < matrix->h);
 
     return matrix->data + row * matrix->w;
 }
 
-static int getMatrixElemIndex(const Matrix* matrix, int row, int col){
+size_t getMatrixElemIndex(const Matrix* matrix, size_t row, size_t col) {
     assert(matrix != NULL);
-    assert(matrix->data != NULL);
-    assert(0 <= row);
+    // assert(0 <= row);
     assert(row < matrix->h);
-    assert(0 <= col);
+    // assert(0 <= col);
     assert(col < matrix->w);
 
     return row * matrix->w + col;
@@ -112,11 +110,11 @@ void matricesAdd(const Matrix* one, const Matrix* two, Matrix* res) {
     assert(one->data != NULL);
     assert(two->data != NULL);
 
-    for (int i = 0; i < res->h; ++i) {
-        for (int j = 0; j < res->w; ++j) {
-            int oneInd = getMatrixElemIndex(one, i, j);
-            int twoInd = getMatrixElemIndex(two, i, j);
-            int resInd = getMatrixElemIndex(res, i, j);
+    for (size_t i = 0; i < res->h; ++i) {
+        for (size_t j = 0; j < res->w; ++j) {
+            size_t oneInd = getMatrixElemIndex(one, i, j);
+            size_t twoInd = getMatrixElemIndex(two, i, j);
+            size_t resInd = getMatrixElemIndex(res, i, j);
 
             // be carefull with overflow
             res->data[resInd] = one->data[oneInd] + two->data[twoInd];
@@ -131,7 +129,7 @@ void matricesAdd(const Matrix* one, const Matrix* two, Matrix* res) {
 // WorkspaceDtor
 // GetMatrixMultipilcationSizes
 
-static void matricesMultiplyWithTranspon(const Matrix* one, const Matrix* two, const MatrixWorkspace* workspace, Matrix* res) {
+void matricesMultiplyWithTranspon(const Matrix* one, const Matrix* two, Matrix* res) {
     assert(one       != NULL);
     assert(two       != NULL);
     assert(res       != NULL);
@@ -144,21 +142,19 @@ static void matricesMultiplyWithTranspon(const Matrix* one, const Matrix* two, c
     Matrix transp = {}; // matrix на стеке громкое заявление
     matrixInit(two->w, two->h, &transp);
     matrixTranspon(two, &transp);
-    for (int i = 0; i < one->h; ++i) {
+    for (size_t i = 0; i < one->h; ++i) {
         const MatrixElem* oneRow = matrixGetRow(one, i);
-        for (int j = 0; j < transp.h; ++j) {
+        for (size_t j = 0; j < transp.h; ++j) {
             // be carefull with overflow
             const MatrixElem* transpRow = matrixGetRow(&transp, j);
             MatrixElem scalar = getScalarMult(oneRow, transpRow, one->w);
-            int elemInd = getMatrixElemIndex(res, i, j);
+            size_t elemInd = getMatrixElemIndex(res, i, j);
             res->data[elemInd] = scalar;
         }
     }
-
-    freeMemory(&transp);
 }
 
-static void matricesMultiplyStandart(const Matrix* one, const Matrix* two, Matrix* res) {
+void matricesMultiplyStandart(const Matrix* one, const Matrix* two, Matrix* res) {
     assert(one       != NULL);
     assert(two       != NULL);
     assert(res       != NULL);
@@ -166,19 +162,18 @@ static void matricesMultiplyStandart(const Matrix* one, const Matrix* two, Matri
     assert(one->data != NULL);
     assert(two->data != NULL);
 
-    for (int i = 0; i < one->h; ++i) {
-        const MatrixElem* oneRow = matrixGetRow(one, i);
-        for (int j = 0; j < two->w; ++j) {
+    for (size_t i = 0; i < one->h; ++i) {
+        for (size_t j = 0; j < two->w; ++j) {
             MatrixElem scalar = 0;
-            for (int e = 0; e < two->h; ++e) {
-                int oneInd = getMatrixElemIndex(one, i, e);
-                int twoInd = getMatrixElemIndex(two, e, j);
+            for (size_t e = 0; e < two->h; ++e) {
+                size_t oneInd = getMatrixElemIndex(one, i, e);
+                size_t twoInd = getMatrixElemIndex(two, e, j);
 
                 // be carefull with overflow
                 scalar += one->data[oneInd] * two->data[twoInd];
             }
 
-            int resInd = getMatrixElemIndex(res, i, j);
+            size_t resInd = getMatrixElemIndex(res, i, j);
             res->data[resInd] = scalar;
         }
     }
