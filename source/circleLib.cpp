@@ -2,11 +2,16 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "../include/circleLib.hpp"
 
-const int MAX_RADIUS = 40;
+const int MAX_RADIUS = 60;
 const long double WIDTH_KOEF = 0.5;
+
+// static const char* brightnessChars = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'.";
+static const char* brightnessChars = "`.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
 
 static int sq(int x) {
     return x * x;
@@ -28,7 +33,7 @@ static int getRowWidth(int radius, int y) {
     return int(half * 2);
 }
 
-void initCircle(int radius, Circle* circle) {
+void initCircle(int radius, Circle* circle, int dx, int dy) {
     assert(circle != NULL);
     assert(radius > 0);
     assert(radius <= MAX_RADIUS);
@@ -49,7 +54,7 @@ void initCircle(int radius, Circle* circle) {
             width = arrLen;
 
         circle->rowsSizes[i] = width;
-        printf("i : %d, y : %d, width: %d\n", i, y, width);
+        //printf("i : %d, y : %d, width: %d\n", i, y, width);
         if (!i)
             circle->strides[i] = 0;
         else
@@ -58,13 +63,30 @@ void initCircle(int radius, Circle* circle) {
     }
 
     circle->matrix = (char*)calloc(sumLen, sizeof(int));
-    printf("sumLen : %d\n", sumLen);
+    // printf("sumLen : %d\n", sumLen);
+
+
+    int centerI = -(radius / 2 + 1 - radius);
+    int centerJ = radius + 1;
+    centerI += dy;
+    centerJ += dx;
+
 
     for (int i = 0; i < arrLen / 2; ++i) {
         int bef    = circle->strides[i];
         int rowLen = circle->rowsSizes[i];
-        for (int j = 0; j < rowLen; ++j)
-            *(circle->matrix + bef + j) = '0' + (j % 10);
+        for (int j = 0; j < rowLen; ++j) {
+            int dist = sqrtl(sq(i - centerI) + sq(j - centerJ));
+            int maxDist = radius + sqrtl(sq(dx) + sq(dy));
+            int ind = round((long double)(strlen(brightnessChars) * sqrtl((long double)dist)) /
+                sqrtl((long double)maxDist));
+            //int ind = round((long double)(strlen(brightnessChars) * dist)) / maxDist;
+            if (ind >= strlen(brightnessChars))
+                ind = strlen(brightnessChars) - 1;
+            ind = strlen(brightnessChars) - ind - 1;
+
+            *(circle->matrix + bef + j) = brightnessChars[ind];
+        }
         *(circle->matrix + bef + rowLen) = '\0';
     }
 }
@@ -76,9 +98,16 @@ int getArrLen(const Circle* circle) {
     return circle->radius << 1 | 1;
 }
 
+void clearScreen() {
+    system("clear");
+    // const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
+    // write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
+}
+
 void printCircle(const Circle* circle) {
     assert(circle != NULL);
 
+    //printf("%s\n", brightnessChars);
     // also it's diametre of circle
     int arrLen = getArrLen(circle);
     for (int i = 0; i < arrLen / 2; ++i) {
@@ -91,12 +120,12 @@ void printCircle(const Circle* circle) {
         printMultipliedChar(' ', bef);
         putchar('\n');
     }
-
-    printf("array : \n");
-    for (int i = 0; i < arrLen / 2; ++i) {
-        const char* s = circle->matrix + circle->strides[i];
-        printf("%s\n", s);
-    }
+//
+//     printf("array : \n");
+//     for (int i = 0; i < arrLen / 2; ++i) {
+//         const char* s = circle->matrix + circle->strides[i];
+//         printf("%s\n", s);
+//     }
 }
 
 /*

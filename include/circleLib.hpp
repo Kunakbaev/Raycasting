@@ -8,7 +8,8 @@ struct Circle {
     int* strides;
 };
 
-void initCircle(int radius, Circle* circle);
+void clearScreen();
+void initCircle(int radius, Circle* circle, int dx, int dy);
 int getArrLen(const Circle* circle);
 void printCircle(const Circle* circle);
 

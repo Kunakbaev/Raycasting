@@ -1,26 +1,66 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <math.h>
+#include <time.h>
+#include <errno.h>
 
 #include "../include/matrixLib.hpp"
 #include "../include/perfomanceTestLib.hpp"
 #include "../include/circleLib.hpp"
 
+
 void classShowcase();
 void testPerfomance();
 
 
+/* msleep(): Sleep for the requested number of milliseconds. */
+int msleep(long msec)
+{
+    struct timespec ts;
+    int res;
+
+    if (msec < 0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    ts.tv_sec = msec / 1000;
+    ts.tv_nsec = (msec % 1000) * 1000000;
+
+    do {
+        res = nanosleep(&ts, &ts);
+    } while (res && errno == EINTR);
+
+    return res;
+}
 
 int main() {
-#ifdef TEST_PERFOMANCE
-    testPerfomance();
-#else
-    classShowcase();
-#endif
+// #ifdef TEST_PERFOMANCE
+//     testPerfomance();
+// #else
+//     classShowcase();
+// #endif
 
-    // Circle circle;
-    // initCircle(31, &circle);
-    // printCircle(&circle);
+    Circle circle;
+
+    //system("setterm -cursor off");
+    setvbuf(stdout, NULL, _IONBF, 0);
+    for (int i = 0; i < 100000; ++i) {
+        int degr = i % 360;// degr /= 2;
+        long double rad = (degr * M_PI) / (long double)180;
+
+        int smallRadius = 21;
+        int dx = round(smallRadius * cos(rad));
+        int dy = round(smallRadius * sin(rad));
+
+        clearScreen();
+        initCircle(51, &circle, (10 + dx), -(10 + dy));
+        printCircle(&circle);
+        msleep(30);
+    }
+    //system("setterm -cursor on");
 
     // Matrix matrix = {};
     // matrixInit(4, 4, &matrix);
