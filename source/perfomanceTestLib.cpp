@@ -78,7 +78,7 @@ long double runOnTests(const Tester* tester, funcPtr solver, long double* disp) 
     long double mean = 0;
     *disp = 0;
 
-    long double* runTimes = (long double*)calloc(tester->cntOfTests, sizeof(long double));
+    long double* runTimes = (long double*)calloc((size_t)tester->cntOfTests, sizeof(long double));
     assert(runTimes != NULL);
     for (int i = 0; i < tester->cntOfTests; ++i) {
         clock_t startTime = clock();

@@ -49,50 +49,66 @@ void testPerfomance() {
     long double meanArifmWithout = runOnTests(&tester, matricesMultiplyStandart, &dispWithout);
     long double meanArifmWith    = runOnTests(&tester, matricesMultiplyWithTranspon, &dispWith);
 
-    printf("mean arifmetic time per test without transp: %.10Lg+-%.10Lg\n",
+    printf("mean arifmetic time per test without transp: %.10Lg +- %.10Lg\n",
         meanArifmWithout, dispWithout);
-    printf("mean arifmetic time per test with    transp: %.10Lg+-%.10Lg\n",
+    printf("mean arifmetic time per test with    transp: %.10Lg +- %.10Lg\n",
         meanArifmWith, dispWith);
     destructTester(&tester);
 }
 
 void classShowcase() {
+//     Matrix matrix = {};
+//     matrixInit(5, 4, &matrix);
+//     matrixRead(&matrix);
+//     matrixPrint(&matrix);
+//
+//     Matrix transpMatrix = {};
+//     matrixInit(matrix.w, matrix.h, &transpMatrix);
+//     matrixTranspon(&matrix, &transpMatrix);
+//
+//     printf("\n\ntranspon matrix:\n");
+//     matrixPrint(&transpMatrix);
+//
+//     Matrix matrix_2 = {};
+//     matrixInit(4, 7, &matrix_2);
+//     matrixRead(&matrix_2);
+//     matrixPrint(&matrix_2);
+//
+//     // ------------------------------       MATRIX MULT     ---------------------------------------
+//
+//     Matrix addResult = {};
+//     matrixInit(matrix.h, matrix.w, &addResult);
+//     matricesAdd(&matrix, &matrix, &addResult);
+//     printf("\n\n addition result matrix:\n");
+//     matrixPrint(&addResult);
+//
+//     // ------------------------------       MATRIX ADD     ---------------------------------------
+//
+//     Matrix multResult = {};
+//     getMatrixMultipilcationSizes(&matrix, &matrix_2, &multResult.h, &multResult.w);
+//     matrixInit(multResult.h, multResult.w, &multResult);
+//     matricesMultiply(&matrix, &matrix_2, &multResult, NO_TRANSPONATION);
+//     printf("\n\n multiplication result matrix:\n");
+//     matrixPrint(&multResult);
+
+    // ----------------------------------       MATRIX DETERM       ----------------------------------
+
     Matrix matrix = {};
-    matrixInit(5, 4, &matrix);
+    matrixInit(4, 4, &matrix);
     matrixRead(&matrix);
     matrixPrint(&matrix);
-
-    Matrix transpMatrix = {};
-    matrixInit(matrix.w, matrix.h, &transpMatrix);
-    matrixTranspon(&matrix, &transpMatrix);
-
-    printf("\n\ntranspon matrix:\n");
-    matrixPrint(&transpMatrix);
-
-    Matrix matrix_2 = {};
-    matrixInit(4, 7, &matrix_2);
-    matrixRead(&matrix_2);
-    matrixPrint(&matrix_2);
-
-    // ------------------------------       MATRIX MULT     ---------------------------------------
-
-    Matrix addResult = {};
-    matrixInit(matrix.h, matrix.w, &addResult);
-    matricesAdd(&matrix, &matrix, &addResult);
-    printf("\n\n addition result matrix:\n");
-    matrixPrint(&addResult);
-
-    // ------------------------------       MATRIX ADD     ---------------------------------------
-
-    Matrix multResult = {};
-    getMatrixMultipilcationSizes(&matrix, &matrix_2, &multResult.h, &multResult.w);
-    matrixInit(multResult.h, multResult.w, &multResult);
-    matricesMultiply(&matrix, &matrix_2, &multResult, NO_TRANSPONATION);
-    printf("\n\n multiplication result matrix:\n");
-    matrixPrint(&multResult);
+    MatrixElem determSlow = getDetermine(&matrix, SUPER_SLOW);
+    MatrixElem determFast = getDetermine(&matrix, CUBIC);
+    printf("determ slow: %d\n", determSlow);
+    printf("determ fast: %d\n", determFast);
 }
 
 /*
+
+1 2 3 4
+9 8 3 1
+5 9 2 20
+5 3 2 8
 
 matrix example:
 

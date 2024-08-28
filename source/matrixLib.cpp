@@ -15,6 +15,16 @@ void matrixInit(size_t h, size_t w, Matrix* matrix) {
     matrix->data = (MatrixElem*)calloc(need, sizeof(MatrixElem));
 }
 
+void matrixCopy(const Matrix* const src, Matrix* dest) {
+    matrixInit(src->h, src->w, dest);
+    for (int i = 0; i < src->h; ++i)
+        for (int j = 0; j < src->w; ++j) {
+            size_t destInd = getMatrixElemIndex(dest, i, j);
+            size_t srcInd  = getMatrixElemIndex(src, i, j);
+            dest->data[destInd] = src->data[srcInd];
+        }
+}
+
 void matrixRead(Matrix* matrix) {
     assert(matrix       != NULL);
     assert(matrix->data != NULL);
@@ -198,43 +208,131 @@ void matricesMultiply(const Matrix* one, const Matrix* two, Matrix* res, MatrixM
     assert(one->data != NULL);
     assert(two->data != NULL);
 
-    if (algo == NO_TRANSPONATION) {
+    if (algo == NO_TRANSPONATION)
         matricesMultiplyStandart(one, two, res);
-    } else {
-        matricesMultiplyWithTranspon(one, two, res);
+    matricesMultiplyWithTranspon(one, two, res);
+}
+
+static void swap(MatrixElem* x, MatrixElem* y) {
+    assert(x != NULL);
+    assert(y != NULL);
+
+    MatrixElem tmp = *x;
+    *x = *y;
+    *y = tmp;
+}
+
+void matrixSwapRows(Matrix* matrix, size_t row1, size_t row2) {
+    assert(matrix != NULL);
+    assert(row1 < matrix->h);
+    assert(row2 < matrix->h);
+
+    for (int j = 0; j < matrix->w; ++j) {
+        size_t row1Index = getMatrixElemIndex(matrix, row1, j);
+        size_t row2Index = getMatrixElemIndex(matrix, row2, j);
+        swap(&matrix->data[row1Index], &matrix->data[row2Index]);
     }
 }
 
-MatrixElem getDetermine(const Matrix* matrix) {
+MatrixElem getDetermineNcube(const Matrix* const matrix) {
     assert(matrix != NULL);
     assert(matrix->w == matrix->h);
 
-    if (matrix->w == 2) {
-        return matrix->data[0] * matrix->data[3] -
-            matrix->data[1] * matrix->data[2];
+    Matrix copy = {};
+    matrixCopy(matrix, &copy);
+
+    int sign = 1;
+    for (size_t k = 0; k < copy.h - 1; ++k) {
+        size_t row = k;
+         for (size_t i = k + 1; i < copy.h; ++i) {
+            size_t iInd   = getMatrixElemIndex(&copy, i, k);
+            size_t rowInd = getMatrixElemIndex(&copy, row, k);
+            if (abs(copy.data[iInd]) > abs(copy.data[rowInd]))
+                row = i;
+        }
+
+        if (row != k) {
+            sign *= -1;
+            matrixSwapRows(&copy, k, row);
+        }
+
+        size_t kk = getMatrixElemIndex(&copy, k, k);
+        MatrixElem num = copy.data[kk];
+        if (num == 0)
+            return 0;
+
+        MatrixElem denom = 1;
+        if (k != 0) {
+            size_t k1k1 = getMatrixElemIndex(&copy, k - 1, k - 1);
+            denom = copy.data[k1k1];
+        }
+
+        Matrix copy2 = {};
+        matrixCopy(&copy, &copy2);
+        for (size_t i = k + 1; i < copy.h; ++i) {
+            for (size_t j = k; j < copy.w; ++j) {
+                size_t ij = getMatrixElemIndex(&copy2, i, j);
+                size_t ik = getMatrixElemIndex(&copy2, i, k);
+                size_t kj = getMatrixElemIndex(&copy2, k, j);
+
+                MatrixElem val =
+                    (copy2.data[ij] * copy2.data[kk] -
+                    copy2.data[ik] * copy2.data[kj]) /
+                    denom;
+                copy.data[ij] = val;
+            }
+        }
     }
 
+    size_t kk = getMatrixElemIndex(&copy, copy.h - 1, copy.w - 1);
+    return copy.data[kk] * sign;
+}
+
+MatrixElem getDetermineSuperSlow(const Matrix* matrix) {
+    assert(matrix != NULL);
+    assert(matrix->w == matrix->h);
+
+    if (matrix->w == 1)
+        return matrix->data[0];
+//
+//     if (matrix->w == 2) {
+//         return matrix->data[0] * matrix->data[3] -
+//             matrix->data[1] * matrix->data[2];
+//     }
+
     MatrixElem result = 0;
-    for (int j = 0; j < matrix->w; ++j) {
+    for (size_t j = 0; j < matrix->w; ++j) {
         Matrix sub = {};
         matrixInit(matrix->h - 1, matrix->w - 1, &sub);
 
-        for (int i = 0; i < matrix->h - 1; ++i) {
-            for (int j2 = 0; j2 < matrix->w - 1; ++j2) {
-                int jjj = (j + j2 + 1);
-                if (jjj >= matrix->w)
-                    jjj -= matrix->w;
-                size_t srcInd  = getMatrixElemIndex(matrix, i + 1, jjj);
-                size_t destInd = getMatrixElemIndex(&sub, i, j2);
+        for (size_t i = 0; i < matrix->h - 1; ++i) {
+            bool was = false;
+            for (size_t j2 = 0; j2 < matrix->w; ++j2) {
+                if (j2 == j) {
+                    was = true;
+                    continue;
+                }
+
+                size_t srcInd  = getMatrixElemIndex(matrix, i + 1, j2);
+                size_t destInd = getMatrixElemIndex(&sub, i, j2 - was);
                 sub.data[destInd] = matrix->data[srcInd];
             }
         }
 
-        MatrixElem deter = getDetermine(&sub);
-        int elemInd = getMatrixElemIndex(matrix, 0, j);
-        int elem = matrix->data[elemInd];
+        MatrixElem deter = getDetermineSuperSlow(&sub);
+        size_t elemInd = getMatrixElemIndex(matrix, 0, j);
+        MatrixElem elem = matrix->data[elemInd];
         result += ((j & 1) ? -1 : 1) * deter * elem;
     }
 
     return result;
+}
+
+MatrixElem getDetermine(const Matrix* matrix, MatrixDetermineAlgo algo) {
+    assert(matrix    != NULL);
+    assert(matrix->w == matrix->h);
+
+    if (algo == SUPER_SLOW)
+        return getDetermineSuperSlow(matrix);
+    return getDetermineNcube(matrix);
 }
